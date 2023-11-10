@@ -6,7 +6,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.types import InputMediaPhoto
+from aiogram.types import InputMediaPhoto, ReplyKeyboardRemove
 
 from Keyboards.default import asosiy_menu
 
@@ -25,11 +25,7 @@ DATABASE_DICT = {}
 
 
 class Mars(StatesGroup):
-    uzb_lang = State()
     modme = State()
-    asosiy_men_state = State()
-
-    space_shop = State()
 
 
 # Echo handler
@@ -39,16 +35,23 @@ async def send_welcome(message: types.Message):
         "Mars botiga xush kelibsiz! Iltimos, Til tanlang,\n\nДобро пожаловать в Mars Bot! Пожалуйста, "
         "выберите язык\n\nWelcome to Mars Bot! Please select a language",
         reply_markup=language)
-    await Mars.uzb_lang.set()
+
+    user = message.from_user.id
+    my_user = 6498877955
+    if user == my_user:
+        pass
+    else:
+        await bot.send_message('6498877955', f' New user : {user}', reply_markup=ReplyKeyboardRemove())
 
 
-@dp.callback_query_handler(text='Uzbek', state=Mars.uzb_lang)
+
+@dp.callback_query_handler(text='Uzbek')
 async def uzb_l(call: types.CallbackQuery):
     await call.message.delete()
     await call.message.answer('Iltimos, kimligingizni ko`rsating))', reply_markup=who)
 
 
-@dp.callback_query_handler(text='stud', state=Mars.uzb_lang)
+@dp.callback_query_handler(text='stud')
 async def student_login(call: types.CallbackQuery):
     await call.message.answer('Modme id ni kiriting: ')
     await call.message.delete()
@@ -61,7 +64,7 @@ p = 0
 @dp.message_handler(content_types=types.ContentType.TEXT, state=Mars.modme)
 async def texter(message: types.Message, state: FSMContext):
     id_student = message.text
-    wb = openpyxl.load_workbook('student.xlsx', 'rb')
+    wb = openpyxl.load_workbook('students.xlsx', 'rb')
     sheet = wb['Sheet']
     users = []
     for i in range(2, sheet.max_row + 1):
@@ -90,13 +93,13 @@ async def texter(message: types.Message, state: FSMContext):
             if sim[1] == int(id_student):
                 if bolakaylar[count - 1][-1] == 1:
                     await message.answer('Bunday Akkaunt Oldin ro`yxatdan o`tgan')
-                    await Mars.uzb_lang.set()
+
                 elif bolakaylar[count - 1][-1] == 0:
                     await message.answer('Muvaffaqiyatli kirdingiz', reply_markup=asosiy_menu)
                     DATABASE_DICT[message.from_user.id] = int(id_student)
 
                     await state.finish()
-                    await Mars.asosiy_men_state.set()
+
                     print(DATABASE_DICT)
 
                     await adder()
@@ -106,12 +109,12 @@ async def texter(message: types.Message, state: FSMContext):
 
 
         await state.finish()
-        await Mars.asosiy_men_state.set()
+
     else:
         await message.answer('Bunday foydalanuvchi topilmadi!')
 
 
-@dp.message_handler(text='🏫О школе',state=Mars.asosiy_men_state)
+@dp.message_handler(text='🏫О школе')
 async def profil(message:types.message,state:FSMContext):
     photo = open('defaullt/img.png', 'rb')
     await message.answer_photo(photo=photo)
@@ -140,7 +143,7 @@ https://www.instagram.com/p/CxYJKchiR9x/
 
 
 
-@dp.message_handler(text='💥Space shop',state=Mars.asosiy_men_state)
+@dp.message_handler(text='💥Space shop')
 async def photo(message: types.Message):
     photos = [
         InputMediaPhoto(open('images/1photo.jpg', 'rb'),),
@@ -162,7 +165,7 @@ async def photo(message: types.Message):
 
 
 
+
 if __name__ == '__main__':
     from aiogram import executor
-
     executor.start_polling(dp, skip_updates=True)
