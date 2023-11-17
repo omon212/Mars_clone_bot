@@ -13,7 +13,7 @@ from Keyboards.default import asosiy_menu
 from Keyboards.inline import language, who, important
 
 # Your Telegram API token
-TOKEN = '6966701444:AAGVJAiMxYhNr18o_IETZLLtZK2aTQ9dZ_0'
+TOKEN = ''
 # Initialize the bot and dispatcher
 bot = Bot(token=TOKEN,parse_mode='HTML')
 dp = Dispatcher(bot, storage=MemoryStorage())
